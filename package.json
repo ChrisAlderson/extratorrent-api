@@ -1,0 +1,35 @@
+{
+  "name": "extratorrent-api",
+  "version": "1.0.0",
+  "description": "An ExtraTorrent wrapper for NodeJS.",
+  "dependencies": {
+    "cheerio": "^0.20.0",
+    "request": "^2.74.0"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "mocha": "^3.0.1"
+  },
+  "license": "MIT",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "scripts": {
+    "test": "mocha --timeout 15000 --reporter spec"
+  },
+  "engines": {
+    "node": ">=6.3.0"
+  },
+  "keywords": [
+      "extratorrent",
+      "extra",
+      "torrent",
+      "torrents",
+      "api"
+    ],
+  "main": "extratorrent-api.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ChrisAlderson/extratorrent-api.git"
+  }
+}
