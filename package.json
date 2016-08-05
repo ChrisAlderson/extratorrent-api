@@ -12,9 +12,6 @@
   },
   "license": "MIT",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "scripts": {
     "test": "mocha --timeout 15000 --reporter spec"
   },
   "engines": {
