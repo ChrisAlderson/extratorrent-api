@@ -54,15 +54,26 @@ module.exports = class ExtraTorrentAPI {
         } else if (!body || res.statusCode >= 400) {
           return reject(new Error(`No data found for uri: '${uri}', statuscode: ${res.statusCode}`));
         } else {
-          return resolve(cheerio.load(body));
+          return resolve(body);
         }
       });
     });
   };
 
-  _formatPage($) {
+  _formatPage(res, page, date) {
+    const $ = cheerio.load(res);
+
     const total_results = parseInt($("td[width]").text().match(/total\s+(\d+)\s+torrents\s+found/i)[1], 10);
-    const result = { total_results, results: [] };
+    let total_pages = Math.round(total_results / 50);
+    if (total_pages > 200) total_pages = 200;
+    
+    const result = {
+      response_time: parseInt(date, 10),
+      page: parseInt(page, 10),
+      total_results: parseInt(total_results, 10),
+      total_pages: parseInt(total_pages, 10),
+      results: []
+     };
 
     $("tr.tlr , tr.tlz").each(function() {
       const entry = $(this).find("td");
@@ -94,24 +105,25 @@ module.exports = class ExtraTorrentAPI {
     return result;
   };
 
-  _advancedSearch({with_words, extact, without, category, added, seeds_from, seeds_to, leechers_from, leechers_to, size_from, size_to, size_type} = {}) {
+  _advancedSearch({page, with_words, extact, without, category, added, seeds_from, seeds_to, leechers_from, leechers_to, size_from, size_to, size_type} = {}, date) {
     if (category && !this._s_cat[category]) throw new Error(`${category} is not a valid value for category!`);
     if (added && !this._added[added]) throw new Error(`'${added}' is not a valid value for added!`);
     if (size_type && !this._size_types[size_type]) throw new Error(`'${size_type}' is not a valid value for value size_type!`);
 
-    return this._get("advanced_search/", { "with": with_words, extact, without, category, added, seeds_from, seeds_to, leechers_from, leechers_to, size_from, size_to, size_type })
-      .then($ => this._formatPage($));
+    return this._get("advanced_search/", { page, "with": with_words, extact, without, category, added, seeds_from, seeds_to, leechers_from, leechers_to, size_from, size_to, size_type })
+      .then(res => this._formatPage(res, page, Date.now() - date));
   };
 
-  _simpleSearch(query) {
-    return this._get("search/", {search: query}).then($ => this._formatPage($));
+  _simpleSearch(query, date) {
+    return this._get("search/", {search: query}).then(res => this._formatPage(res, 1, Date.now() - date));
   };
 
   search(query) {
+    const t = Date.now();
     if (typeof(query) === "string") {
-      return this._simpleSearch(query);
+      return this._simpleSearch(query, t);
     } else if (typeof(query) === "object") {
-      return this._advancedSearch(query)
+      return this._advancedSearch(query, t)
     } else {
       throw new Error(`Query needs to be an object or a string!`);
     }

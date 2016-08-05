@@ -11,9 +11,10 @@ describe("ExtraTorrent", () => {
     extraTorrentAPI = new ExtraTorrentAPI();
     query = {
       with_words: "ettv",
-      widthout: "720p",
+      without: "720p",
+      page: 2,
       category: "tv",
-      added: 1,
+      added: 7,
       size_type: "b"
     };
   });

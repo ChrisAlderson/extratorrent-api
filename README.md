@@ -37,9 +37,10 @@ extraTorrentAPI.search("ettv")
 // Execute an advanced search
 extraTorrentAPI.search({
   with_words: "ettv",
-  widthout: "720p",
+  without: "720p",
+  page: 2,
   category: "tv",
-  added: 1,
+  added: 7,
   size_type: "b"
 }).then(res => console.log(res))
   .catch(err => console.error(err));
@@ -50,7 +51,10 @@ extraTorrentAPI.search({
 Example of a response
 ```js
 {
-  "total_results": 35937,
+  "response_time": 594,
+  "page": 2,
+  "total_results": 179,
+  "total_pages": 4,
   "results": [{
       "torrent_link": "/download/5089468/Queen.of.the.South.S01E07.WEB-DL.XviD-FUM%5Bettv%5D.torrent",
       "language": "English",
@@ -71,6 +75,7 @@ Example of a response
 
 These are the parameters available for the advanced search:
 
+- page
 - with_words
 - extact
 - without
