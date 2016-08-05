@@ -15,7 +15,7 @@ npm install --save extratorrent-api
 
 ### Initialize
 ```js
-const ExtraTorrentAPI = require("../extratorrent-api");
+const ExtraTorrentAPI = require("extratorrent-api");
 
 // Options are the request default options.
 const extraTorrentAPI = new ExtraTorrentAPI();
