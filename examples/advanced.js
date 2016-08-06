@@ -3,7 +3,7 @@
 // Import the neccesary modules.
 const ExtraTorrentAPI = require("../extratorrent-api");
 
-const extraTorrentAPI = new ExtraTorrentAPI({debug: true});
+const extraTorrentAPI = new ExtraTorrentAPI();
 
 // Execute an advanced search
 extraTorrentAPI.search({
@@ -15,3 +15,10 @@ extraTorrentAPI.search({
   size_type: "b"
 }).then(res => console.log(res))
   .catch(err => console.error(err));
+
+// extraTorrentAPI.search({
+//   width_words: "zeke23"
+//   category: "books",
+//   added: 3
+// }).then(res => console.log(res))
+//   .catch(err => console.error(err));

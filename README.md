@@ -74,20 +74,37 @@ Example of a response
 ## Parameters
 
 These are the parameters available for the advanced search:
+```
+- page                    # Number of the page you want to search
+- with_words              # With all of the words
+- extact                  # With the exact phrase
+- without                 # Without the words
+- category                # See categories
+- added                   # Number of last added 1 day (1), 3 days (3) or week (7).
+- seeds_from              # Seeds more than the number given
+- seeds_to                # Seeds less than the number given
+- leechers_from           # Leecher more than the number given
+- leechers_to             # Leechers less than the number given
+- size_from               # Torrent size more than the number given
+- size_to                 # Torrent size less than the number given
+- size_type               # b for byte, kb for kilobyte etc.
+```
 
-- page
-- with_words
-- extact
-- without
-- category
-- added
-- seeds_from
-- seeds_to
-- leechers_from
-- leechers_to
-- size_from
-- size_to
-- size_type
+**NOTE:** The parameter `with_words` is required for an advanced search.
+
+##### Categories
+
+ - anime
+ - books
+ - games
+ - movies
+ - music
+ - pictures
+ - software
+ - tv
+ - other
+ - mobile
+ - adult
 
 # License
 
