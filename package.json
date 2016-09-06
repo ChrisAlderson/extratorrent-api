@@ -3,12 +3,12 @@
   "version": "1.0.2",
   "description": "An ExtraTorrent wrapper for NodeJS.",
   "dependencies": {
-    "cheerio": "^0.20.0",
+    "cheerio": "^0.22.0",
     "request": "^2.74.0"
   },
   "devDependencies": {
     "chai": "^3.5.0",
-    "mocha": "^3.0.1"
+    "mocha": "^3.0.2"
   },
   "license": "MIT",
   "scripts": {
