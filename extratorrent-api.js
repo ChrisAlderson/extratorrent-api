@@ -83,9 +83,9 @@ module.exports = class ExtraTorrentAPI {
       let language, title, sub_category
 
       const torrent_link = ExtraTorrentAPI._options.baseUrl + entry.eq(0).find("a").attr("href").replace(/torrent_/i , "");
-      const size = entry.eq(3).text();
-      const seeds = parseInt($(this).find("td.sy").text(), 10);
-      const leechers = parseInt($(this).find("td.ly").text(), 10);
+      const size = entry.eq(4).text();
+      const seeds = ($(this).find("td.sy").text() == '') ? 0 : parseInt($(this).find("td.sy").text(), 10);
+      const leechers = ($(this).find("td.ly").text() == '') ? 0 : parseInt($(this).find("td.ly").text(), 10);
       const peers = seeds + leechers;
       const quality = parseInt(entry.last().find("div").attr("class").replace(/r/i, ""), 10);
 
