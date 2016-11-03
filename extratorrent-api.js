@@ -111,12 +111,30 @@ module.exports = class ExtraTorrentAPI {
 
   _advancedSearch({page, with_words, extact, without, category, added, seeds_from, seeds_to, leechers_from, leechers_to, size_from, size_to, size_type} = {}, date) {
     if (!with_words) throw new Error("'with_words' is a required field");
-    if (category && !this._s_cat[category]) throw new Error(`${category} is not a valid value for category!`);
     if (added && !this._added[added]) throw new Error(`'${added}' is not a valid value for added!`);
     if (size_type && !this._size_types[size_type]) throw new Error(`'${size_type}' is not a valid value for value size_type!`);
 
-    return this._get("/advanced_search/", { page, "with": with_words, extact, without, category, added, seeds_from, seeds_to, leechers_from, leechers_to, size_from, size_to, size_type })
-      .then(res => this._formatPage(res, page, Date.now() - date));
+    if (category && !this._s_cat[category]) {
+      throw new Error(`${category} is not a valid value for category!`);
+    } else if (category && this._s_cat[category]) {
+      category = this._s_cat[category];
+    }
+
+    return this._get("/advanced_search/", {
+      page,
+      "with": with_words,
+      extact,
+      without,
+      s_cat: category,
+      added,
+      seeds_from,
+      seeds_to,
+      leechers_from,
+      leechers_to,
+      size_from,
+      size_type,
+      size_to
+    }).then(res => this._formatPage(res, page, Date.now() - date));
   };
 
   _simpleSearch(query, date) {
