@@ -82,8 +82,10 @@ module.exports = class ExtraTorrentAPI {
 
       let language, title, sub_category
 
+      const url = ExtraTorrentAPI._options.baseUrl + entry.eq(2).find("a").attr("href");
       const torrent_link = ExtraTorrentAPI._options.baseUrl + entry.eq(0).find("a").eq(0).attr("href");
       const magnet = entry.eq(0).find("a").eq(1).attr("href");
+      const date_added = entry.eq(3).text();
       const size = entry.eq(4).text();
       const seeds = ($(this).find("td.sy").text() == '') ? 0 : parseInt($(this).find("td.sy").text(), 10);
       const leechers = ($(this).find("td.ly").text() == '') ? 0 : parseInt($(this).find("td.ly").text(), 10);
@@ -103,7 +105,7 @@ module.exports = class ExtraTorrentAPI {
         comments = comments.length;
       };
 
-      result.results.push({ torrent_link, magnet, language, title, sub_category, comments, size, seeds, leechers, peers, quality });
+      result.results.push({ url, torrent_link, magnet, language, title, sub_category, comments, date_added, size, seeds, leechers, peers, quality });
     });
 
     return result;
