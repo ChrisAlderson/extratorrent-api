@@ -1,6 +1,6 @@
 {
   "name": "extratorrent-api",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "An ExtraTorrent wrapper for NodeJS.",
   "dependencies": {
     "cheerio": "^0.22.0",
