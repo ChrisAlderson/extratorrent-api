@@ -65,7 +65,7 @@ module.exports = class ExtraTorrentAPI {
   _formatPage(res, page, date) {
     const $ = cheerio.load(res);
 
-    const total_results = parseInt($("td[width]").text().match(/total\s+(\d+)\s+torrents\s+found/i)[1], 10);
+    const total_results = parseInt($("td[style]").text().match(/total\s+(\d+)\s+torrents\s+found/i)[1], 10);
     let total_pages = Math.ceil(total_results / 50);
     if (total_pages > 200) total_pages = 200;
 
