@@ -1,12 +1,40 @@
 "use strict";
 
 const cheerio = require("cheerio");
+const CryptoJS = require("crypto-js");
 const req = require("request");
 const querystring = require("querystring");
 
 const defaultOptions = {
   baseUrl: "https://extratorrent.cc",
   timeout: 4 * 1000
+};
+
+// taken from http://extratorrent.cc/scripts/main.js
+const CryptoJSAesJson = {
+
+  stringify(a) {
+    const j = {
+      ct: a.ciphertext.toString(CryptoJS.enc.Base64)
+    };
+    if (a.iv) j.iv = a.iv.toString();
+    if (a.salt) j.s = a.salt.toString();
+
+    return JSON.stringify(j);
+  },
+
+  parse(a) {
+    const j = JSON.parse(a);
+    const b = CryptoJS.lib.CipherParams.create({
+      ciphertext: CryptoJS.enc.Base64.parse(j.ct)
+    });
+
+    if (j.iv) b.iv = CryptoJS.enc.Hex.parse(j.iv);
+    if (j.s) b.salt = CryptoJS.enc.Hex.parse(j.s);
+
+    return b;
+  }
+
 };
 
 module.exports = class ExtraTorrentAPI {
@@ -56,6 +84,7 @@ module.exports = class ExtraTorrentAPI {
         } else if (!body || res.statusCode >= 400) {
           return reject(new Error(`No data found for uri: '${uri}', statuscode: ${res.statusCode}`));
         } else {
+          // console.log(body);
           return resolve(body);
         }
       });
@@ -63,21 +92,39 @@ module.exports = class ExtraTorrentAPI {
   };
 
   _formatPage(res, page, date) {
-    const $ = cheerio.load(res);
+    let $ = cheerio.load(res);
 
-    const total_results = parseInt($("td[style]").text().match(/total\s+(\d+)\s+torrents\s+found/i)[1], 10);
+    // const hashObject = JSON.parse($('div#e_content').text());
+    const hashObject = $('div#e_content').text();
+    const variable = "function et(){return ";
+    const text = $("script").text();
+    const et = text.match(/function\set\(\)\{return\s\"(\d+)\";\}/i)[1];
+    const salt = JSON.parse(hashObject).s;
+    let key = '';
+
+    for (let i = 1; i <= et.length / 2; i++) {
+      key += salt[parseInt(et.substr(2 * (i - 1), 2))]
+    };
+
+    const data = JSON.parse(CryptoJS.AES.decrypt(hashObject, key, {
+      format: CryptoJSAesJson
+    }).toString(CryptoJS.enc.Utf8));
+
+    $ = cheerio.load(data);
+
+    const total_results = data.match(/total\s\<b\>(\d+)\<\/b\>\storrents\sfound/i)[1];
     let total_pages = Math.ceil(total_results / 50);
     if (total_pages > 200) total_pages = 200;
 
     const result = {
       response_time: parseInt(date, 10),
       page: parseInt(page, 10),
-      total_results: parseInt(total_results, 10),
+      total_results: total_results,
       total_pages: parseInt(total_pages, 10),
       results: []
      };
 
-    $("tr.tlr , tr.tlz").each(function() {
+    $("tr.tlr, tr.tlz").each(function() {
       const entry = $(this).find("td");
 
       let language, title, sub_category
