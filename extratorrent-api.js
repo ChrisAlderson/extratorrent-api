@@ -94,7 +94,6 @@ module.exports = class ExtraTorrentAPI {
   _formatPage(res, page, date) {
     let $ = cheerio.load(res);
 
-    // const hashObject = JSON.parse($('div#e_content').text());
     const hashObject = $('div#e_content').text();
     const variable = "function et(){return ";
     const text = $("script").text();
@@ -112,14 +111,14 @@ module.exports = class ExtraTorrentAPI {
 
     $ = cheerio.load(data);
 
-    const total_results = data.match(/total\s\<b\>(\d+)\<\/b\>\storrents\sfound/i)[1];
+    const total_results = parseInt(data.match(/total\s\<b\>(\d+)\<\/b\>\storrents\sfound/i)[1]);
     let total_pages = Math.ceil(total_results / 50);
     if (total_pages > 200) total_pages = 200;
 
     const result = {
       response_time: parseInt(date, 10),
       page: parseInt(page, 10),
-      total_results: total_results,
+      total_results,
       total_pages: parseInt(total_pages, 10),
       results: []
      };
