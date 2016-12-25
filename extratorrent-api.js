@@ -12,7 +12,7 @@ const defaultOptions = {
 
 module.exports = class ExtraTorrentAPI {
 
-  constructor({options = defaultOptions, debug = false, cloudflare = false} = {}) {
+  constructor({options = defaultOptions, debug = false, cloudflare = true} = {}) {
     ExtraTorrentAPI._options = options;
 
     if (cloudflare) {
@@ -53,7 +53,7 @@ module.exports = class ExtraTorrentAPI {
       "mb": "mb",
       "gb": "gb"
     };
-  };
+  }
 
   _get(uri, qs, retry = true) {
     if (this._debug) console.warn(`Making request to: '${uri}'`);
@@ -127,7 +127,7 @@ module.exports = class ExtraTorrentAPI {
     });
 
     return result;
-  };
+  }
 
   _advancedSearch({page, with_words, extact, without, category, added, seeds_from, seeds_to, leechers_from, leechers_to, size_from, size_to, size_type} = {}, date) {
     if (!with_words) throw new Error("'with_words' is a required field");
@@ -155,11 +155,11 @@ module.exports = class ExtraTorrentAPI {
       size_type,
       size_to
     }).then(res => this._formatPage(res, page, Date.now() - date));
-  };
+  }
 
   _simpleSearch(query, date) {
     return this._get("/search/", {search: query}).then(res => this._formatPage(res, 1, Date.now() - date));
-  };
+  }
 
   search(query) {
     const t = Date.now();
@@ -170,6 +170,6 @@ module.exports = class ExtraTorrentAPI {
     } else {
       throw new Error(`Query needs to be an object or a string!`);
     }
-  };
+  }
 
-};
+}
