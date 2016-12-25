@@ -15,7 +15,7 @@ npm install --save extratorrent-api
 
 ### Initialize
 ```js
-const ExtraTorrentAPI = require("extratorrent-api");
+const ExtraTorrentAPI = require('extratorrent-api');
 
 // Options are the request default options.
 const extraTorrentAPI = new ExtraTorrentAPI();
@@ -26,7 +26,7 @@ const extraTorrentAPI = new ExtraTorrentAPI();
 #### Simple search
 ```js
 // Execute a simple search
-extraTorrentAPI.search("ettv")
+extraTorrentAPI.search('ettv')
   .then(res => console.log(res))
   .catch(err => console.error(err));
 
@@ -36,12 +36,12 @@ extraTorrentAPI.search("ettv")
 ```js
 // Execute an advanced search
 extraTorrentAPI.search({
-  with_words: "ettv",
-  without: "720p",
+  with_words: 'ettv',
+  without: '720p',
   page: 2,
-  category: "tv",
+  category: 'tv',
   added: 7,
-  size_type: "b"
+  size_type: 'b'
 }).then(res => console.log(res))
   .catch(err => console.error(err));
 ```
@@ -51,20 +51,20 @@ extraTorrentAPI.search({
 Example of a response
 ```js
 {
-  "response_time": 594,
-  "page": 2,
-  "total_results": 179,
-  "total_pages": 4,
-  "results": [{
-      "torrent_link": "/download/5089468/Queen.of.the.South.S01E07.WEB-DL.XviD-FUM%5Bettv%5D.torrent",
-      "language": "English",
-      "title": "Queen.of.the.South.S01E07.WEB-DL.XviD-FUM[ettv]",
-      "sub_category": "Queen.of.the.South.S01E07.WEB-DL.XviD-FUM[ettv]",
-      "comments": 0,
-      "size": "348.07 MB",
-      "seeds": 2193,
-      "leechers": 2094,
-      "quality": 10
+  response_time: 594,
+  page: 2,
+  total_results: 179,
+  total_pages: 4,
+  results: [{
+      torrent_link: '/download/5089468/Queen.of.the.South.S01E07.WEB-DL.XviD-FUM%5Bettv%5D.torrent',
+      language: 'English',
+      title: 'Queen.of.the.South.S01E07.WEB-DL.XviD-FUM[ettv]',
+      sub_category: 'Queen.of.the.South.S01E07.WEB-DL.XviD-FUM[ettv]',
+      comments: 0,
+      size: '348.07 MB',
+      seeds: 2193,
+      leechers: 2094,
+      quality: 10
     },
     ...
   ]

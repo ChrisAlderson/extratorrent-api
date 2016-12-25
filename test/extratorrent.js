@@ -1,26 +1,26 @@
-"use strict";
+'use strict';
 
-const chai = require("chai");
+const chai = require('chai');
 const assert = chai.assert;
-const ExtraTorrentAPI = require("../extratorrent-api");
+const ExtraTorrentAPI = require('../extratorrent-api');
 
-describe("ExtraTorrent", () => {
+describe('ExtraTorrent', () => {
 
   let extraTorrentAPI, query;
   before(() => {
     extraTorrentAPI = new ExtraTorrentAPI();
     query = {
-      with_words: "ettv",
-      without: "720p",
+      with_words: 'ettv',
+      without: '720p',
       page: 2,
-      category: "tv",
+      category: 'tv',
       added: 7,
-      size_type: "b"
+      size_type: 'b'
     };
   });
 
-  it("Should get results with a simple search", done => {
-    extraTorrentAPI.search("ettv")
+  it('Should get results with a simple search', done => {
+    extraTorrentAPI.search('ettv')
       .then(res => {
         assert.isArray(res.results);
         assert.isNumber(res.total_results);
@@ -28,7 +28,7 @@ describe("ExtraTorrent", () => {
       }).catch(err => done(err));
   });
 
-  it("Should get results with an advanced search", done => {
+  it('Should get results with an advanced search', done => {
     extraTorrentAPI.search(query)
       .then(res => {
         assert.isArray(res.results);
