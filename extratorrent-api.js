@@ -1,9 +1,9 @@
 "use strict";
 
 const cheerio = require("cheerio");
-const CryptoJS = require("crypto-js");
-const req = require("request");
+const cloudscraper = require('cloudscraper');
 const querystring = require("querystring");
+const request = require("request");
 
 const defaultOptions = {
   baseUrl: "https://extratorrent.cc",
@@ -12,10 +12,19 @@ const defaultOptions = {
 
 module.exports = class ExtraTorrentAPI {
 
-  constructor({options = defaultOptions, debug = false} = {}) {
+  constructor({options = defaultOptions, debug = false, cloudflare = false} = {}) {
     ExtraTorrentAPI._options = options;
 
-    this._request = req.defaults(options);
+    if (cloudflare) {
+      this._cloudflare = true;
+      this._request = cloudscraper.request;
+      this._options = options;
+      if (debug) {
+        console.warn('Processing with cloudscraper...');
+      }
+    } else {
+      this._request = request.defaults(options);
+    }
     this._debug = debug;
 
     this._s_cat = {
@@ -47,21 +56,29 @@ module.exports = class ExtraTorrentAPI {
   };
 
   _get(uri, qs, retry = true) {
-    if (this._debug) console.warn(`Making request to: '${uri}?${querystring.stringify(qs)}'`);
+    if (this._debug) console.warn(`Making request to: '${uri}'`);
     return new Promise((resolve, reject) => {
-      this._request({ uri, qs }, (err, res, body) => {
+      let options;
+      if (this._cloudflare) {
+        options = Object.assign({}, this._options, {method: 'GET', url: this._options.baseUrl + uri, qs});
+        options.baseUrl = null;
+      } else {
+        options = { uri, qs };
+      }
+      this._request(options, (err, res, body) => {
         if (err && retry) {
           return resolve(this._get(uri, qs, false));
         } else if (err) {
           return reject(err);
         } else if (!body || res.statusCode >= 400) {
-          return reject(new Error(`No data found for uri: '${uri}', statuscode: ${res.statusCode}`));
+          return reject(new Error(`No data found with url: '${uri}', statusCode: ${res.statusCode}`));
         } else {
+          // console.log(body);
           return resolve(body);
         }
       });
     });
-  };
+  }
 
   _formatPage(res, page, date) {
     const $ = cheerio.load(res);
@@ -76,7 +93,7 @@ module.exports = class ExtraTorrentAPI {
       total_results,
       total_pages: parseInt(total_pages, 10),
       results: []
-     };
+    };
 
     $("tr.tlr, tr.tlz").each(function() {
       const entry = $(this).find("td");

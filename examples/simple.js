@@ -3,7 +3,7 @@
 // Import the neccesary modules.
 const ExtraTorrentAPI = require("../extratorrent-api");
 
-const extraTorrentAPI = new ExtraTorrentAPI({debug: true});
+const extraTorrentAPI = new ExtraTorrentAPI({debug: false});
 
 // Execute a simple search
 extraTorrentAPI.search("ettv")
