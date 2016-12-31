@@ -2,12 +2,40 @@
 
 const cheerio = require('cheerio');
 const cloudscraper = require('cloudscraper');
+const CryptoJS = require("crypto-js");
 const querystring = require('querystring');
 const request = require('request');
 
 const defaultOptions = {
   baseUrl: 'https://extratorrent.cc',
   timeout: 4 * 1000
+};
+
+// taken from http://extratorrent.cc/scripts/main.js
+const CryptoJSAesJson = {
+
+  stringify(a) {
+    const j = {
+      ct: a.ciphertext.toString(CryptoJS.enc.Base64)
+    };
+    if (a.iv) j.iv = a.iv.toString();
+    if (a.salt) j.s = a.salt.toString();
+
+    return JSON.stringify(j);
+  },
+
+  parse(a) {
+    const j = JSON.parse(a);
+    const b = CryptoJS.lib.CipherParams.create({
+      ciphertext: CryptoJS.enc.Base64.parse(j.ct)
+    });
+
+    if (j.iv) b.iv = CryptoJS.enc.Hex.parse(j.iv);
+    if (j.s) b.salt = CryptoJS.enc.Hex.parse(j.s);
+
+    return b;
+  }
+
 };
 
 module.exports = class ExtraTorrentAPI {
@@ -81,9 +109,22 @@ module.exports = class ExtraTorrentAPI {
   }
 
   _formatPage(res, page, date) {
-    const $ = cheerio.load(res);
+    let $ = cheerio.load(res);
 
-    const total_results = parseInt($('td[style]').text().match(/total\s+(\d+)\s+torrents\s+found/i)[1], 10);
+    const hashObject = $('div#e_content').text();
+    const salt = JSON.parse(hashObject).s;
+
+    const latestNewsId = $('.ten_articles li a').eq(0).attr('href').split('le/')[1].split('/')[0];
+    const extraNum = $('.ten_len').length;
+    const key = salt[1] + extraNum + extraNum + '0' + latestNewsId + salt[5];
+
+    const data = JSON.parse(CryptoJS.AES.decrypt(hashObject, key, {
+      format: CryptoJSAesJson
+    }).toString(CryptoJS.enc.Utf8));
+
+    $ = cheerio.load(data);
+
+    const total_results = parseInt(data.match(/total\s\<b\>(\d+)\<\/b\>\storrents\sfound/i)[1]);
     let total_pages = Math.ceil(total_results / 50);
     if (total_pages > 200) total_pages = 200;
 
