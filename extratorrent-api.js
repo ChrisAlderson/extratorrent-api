@@ -114,9 +114,9 @@ module.exports = class ExtraTorrentAPI {
     const hashObject = $('div#e_content').text();
     const salt = JSON.parse(hashObject).s;
 
-    const latestNewsId = $('.ten_articles li a').eq(0).attr('href').split('le/')[1].split('/')[0];
+    const newsId = $('.ten_articles li a').eq(3).attr('href').split('le/')[1].split('/')[0];
     const extraNum = $('.ten_len').length;
-    const key = salt[1] + extraNum + extraNum + '0' + latestNewsId + salt[5];
+    const key = `${salt[5]}0${extraNum}0${newsId}${salt[2]}`;
 
     const data = JSON.parse(CryptoJS.AES.decrypt(hashObject, key, {
       format: CryptoJSAesJson
