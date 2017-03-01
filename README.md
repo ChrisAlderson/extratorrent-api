@@ -15,10 +15,11 @@ npm install --save extratorrent-api
 
 ### Initialize
 ```js
-const ExtraTorrentAPI = require('extratorrent-api');
+const { RSS, Website } = require('extratorrent-api');
 
-// Options are the request default options.
-const extraTorrentAPI = new ExtraTorrentAPI({[options, debug, cloudflare]});
+const extraTorrentAPI = new RSS({baseUrl, debug});
+// Or
+const extraTorrentAPI = new Website({baseUrl, debug});
 ```
 
 ### Example usage
@@ -73,7 +74,7 @@ Example of a response
 
 ## Parameters
 
-These are the parameters available for the advanced search:
+These are the parameters available for the advanced search to search the website:
 ```
 - page                    # Number of the page you want to search
 - with_words              # With all of the words
@@ -90,7 +91,14 @@ These are the parameters available for the advanced search:
 - size_type               # b for byte, kb for kilobyte etc.
 ```
 
-**NOTE:** The parameter `with_words` is required for an advanced search.
+**NOTE:** The parameter `with_words` is required for an advanced search on the website.
+
+These are the parameters available for the advanced search to search the RSS feed:
+```
+- with_words              # With all of the words
+- category                # See categories
+- user                    # Torrents from a specific username
+```
 
 ##### Categories
 
@@ -110,7 +118,7 @@ These are the parameters available for the advanced search:
 
 MIT License
 
-Copyright (c) 2016 - extratorrent-api - Released under the MIT license.
+Copyright (c) 2017 - extratorrent-api - Released under the MIT license.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
