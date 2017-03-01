@@ -1,5 +1,7 @@
 'use strict';
 
+const atob = require('atob');
+const Canvas = require('canvas');
 const cheerio = require('cheerio');
 const cloudscraper = require('cloudscraper');
 const CryptoJS = require("crypto-js");
@@ -93,6 +95,7 @@ module.exports = class ExtraTorrentAPI {
       } else {
         options = { uri, qs };
       }
+
       this._request(options, (err, res, body) => {
         if (err && retry) {
           return resolve(this._get(uri, qs, false));
@@ -100,23 +103,42 @@ module.exports = class ExtraTorrentAPI {
           return reject(err);
         } else if (!body || res.statusCode >= 400) {
           return reject(new Error(`No data found with url: '${uri}', statusCode: ${res.statusCode}`));
-        } else {
-          // console.log(body);
-          return resolve(body);
         }
+
+        return resolve(body);
       });
     });
+  }
+
+  _unpack(str) {
+    const begin = 'iVBORw0KGgoAAAANSUhEU';
+    const base64String = `${begin}${str.split(begin)[1].split("'")[0]}`;
+
+    const imageObject = new Canvas.Image;
+    imageObject.src = new Buffer(base64String, 'base64');
+
+    const canvasObject = new Canvas(imageObject.width, imageObject.height);
+    const canvasContext = canvasObject.getContext('2d');
+    canvasContext.drawImage(imageObject, 0, 0);
+
+    const imageData = canvasContext.getImageData(0, 0, canvasObject.width, canvasObject.height);
+
+    let resultString = '';
+    for(let i = 0; i < imageData.data.length; i += 4) {
+      resultString += (imageData.data[i] != 255) ? String.fromCharCode(imageData.data[i]) : '';
+    }
+    resultString = resultString.trim();
+
+    return querystring.unescape(decodeURIComponent(atob(resultString)));
   }
 
   _formatPage(res, page, date) {
     let $ = cheerio.load(res);
 
-    const hashObject = $('div#e_content').text();
-    const salt = JSON.parse(hashObject).s;
+    const hashObject = $('#e_content').text();
 
-    const newsId = $('.ten_articles li a').eq(3).attr('href').split('le/')[1].split('/')[0];
-    const extraNum = $('.ten_len').length;
-    const key = `${salt[5]}0${extraNum}0${newsId}${salt[2]}`;
+    const unpacked = this._unpack($('div#e_content + script').eq(0).text());
+    const key = unpacked.match(/\.decrypt\(ll\.html\(\), \'(.*)\',/i)[1];
 
     const data = JSON.parse(CryptoJS.AES.decrypt(hashObject, key, {
       format: CryptoJSAesJson
@@ -208,9 +230,9 @@ module.exports = class ExtraTorrentAPI {
       return this._simpleSearch(query, t);
     } else if (typeof(query) === 'object') {
       return this._advancedSearch(query, t)
-    } else {
-      throw new Error(`Query needs to be an object or a string!`);
     }
+
+    throw new Error(`Query needs to be an object or a string!`);
   }
 
 }
