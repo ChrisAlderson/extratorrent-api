@@ -3,11 +3,12 @@
   "version": "1.0.10",
   "description": "An ExtraTorrent wrapper for NodeJS.",
   "dependencies": {
+    "atob": "^2.0.3",
+    "canvas": "^1.6.4",
     "cheerio": "^0.22.0",
     "crypto-js": "^3.1.9-1",
-    "request": "^2.79.0",
-    "canvas": "^1.6.4",
-    "atob": "^2.0.3"
+    "got": "^6.7.1",
+    "xml2js": "^0.4.17"
   },
   "devDependencies": {
     "chai": "^3.5.0",

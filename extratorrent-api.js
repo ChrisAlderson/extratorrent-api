@@ -5,12 +5,9 @@ const Canvas = require('canvas');
 const cheerio = require('cheerio');
 const CryptoJS = require("crypto-js");
 const querystring = require('querystring');
-const request = require('request');
 
-const defaultOptions = {
-  baseUrl: 'https://extratorrent.cc',
-  timeout: 4 * 1000
-};
+const { Builder, Parser } = require('xml2js');
+const got = require('got');
 
 // taken from http://extratorrent.cc/scripts/main.js
 const CryptoJSAesJson = {
@@ -41,10 +38,8 @@ const CryptoJSAesJson = {
 
 module.exports = class ExtraTorrentAPI {
 
-  constructor({options = defaultOptions, debug = false} = {}) {
-    ExtraTorrentAPI._options = options;
-
-    this._request = request.defaults(options);
+  constructor({baseUrl = 'https://extratorrent.cc', debug = false} = {}) {
+    this._baseUrl = baseUrl;
     this._debug = debug;
 
     this._s_cat = {
@@ -75,20 +70,26 @@ module.exports = class ExtraTorrentAPI {
     };
   }
 
-  _get(uri, qs, retry = true) {
-    if (this._debug) console.warn(`Making request to: '${uri}'`);
+  _toJSON(xml) {
     return new Promise((resolve, reject) => {
-      this._request.get({ uri, qs }, (err, res, body) => {
-        if (err && retry) {
-          return resolve(this._get(uri, qs, false));
-        } else if (err) {
-          return reject(err);
-        } else if (!body || res.statusCode >= 400) {
-          return reject(new Error(`No data found with url: '${uri}', statusCode: ${res.statusCode}`));
-        }
-
-        return resolve(body);
+      return this._parser.parseString(xml, (err, res) => {
+        if (err) return reject(err);
+        return resolve(res);
       });
+    });
+  }
+
+  _get(uri, data = {}, xml = false) {
+    if (this._debug) console.warn(`Making request to: '${uri}', opts: ${JSON.stringify(opts)}`);
+
+    const opts = {
+      method: 'GET',
+      query: data
+    };
+
+    return got(`https://extratorrent.cc/${uri}`, opts).then(({body}) => {
+      if (xml) return this._toJSON(body);
+      return body;
     });
   }
 
@@ -145,8 +146,8 @@ module.exports = class ExtraTorrentAPI {
 
       let language, title, sub_category
 
-      const url = ExtraTorrentAPI._options.baseUrl + entry.eq(2).find('a').attr('href');
-      const torrent_link = ExtraTorrentAPI._options.baseUrl + entry.eq(0).find('a').eq(0).attr('href');
+      const url = this._baseUrl + entry.eq(2).find('a').attr('href');
+      const torrent_link = this._baseUrl + entry.eq(0).find('a').eq(0).attr('href');
       const magnet = entry.eq(0).find('a').eq(1).attr('href');
       const date_added = entry.eq(3).text();
       const size = entry.eq(4).text();
@@ -185,7 +186,7 @@ module.exports = class ExtraTorrentAPI {
       category = this._s_cat[category];
     }
 
-    return this._get('/advanced_search/', {
+    return this._get('advanced_search/', {
       page,
       'with': with_words,
       extact,
@@ -203,7 +204,7 @@ module.exports = class ExtraTorrentAPI {
   }
 
   _simpleSearch(query, date) {
-    return this._get('/search/', {search: query}).then(res => this._formatPage(res, 1, Date.now() - date));
+    return this._get('search/', {search: query}).then(res => this._formatPage(res, 1, Date.now() - date));
   }
 
   search(query) {
