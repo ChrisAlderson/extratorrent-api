@@ -3,7 +3,6 @@
 const atob = require('atob');
 const Canvas = require('canvas');
 const cheerio = require('cheerio');
-const cloudscraper = require('cloudscraper');
 const CryptoJS = require("crypto-js");
 const querystring = require('querystring');
 const request = require('request');
@@ -42,19 +41,10 @@ const CryptoJSAesJson = {
 
 module.exports = class ExtraTorrentAPI {
 
-  constructor({options = defaultOptions, debug = false, cloudflare = true} = {}) {
+  constructor({options = defaultOptions, debug = false} = {}) {
     ExtraTorrentAPI._options = options;
 
-    if (cloudflare) {
-      this._cloudflare = true;
-      this._request = cloudscraper.request;
-      this._options = options;
-      if (debug) {
-        console.warn('Processing with cloudscraper...');
-      }
-    } else {
-      this._request = request.defaults(options);
-    }
+    this._request = request.defaults(options);
     this._debug = debug;
 
     this._s_cat = {
@@ -88,15 +78,7 @@ module.exports = class ExtraTorrentAPI {
   _get(uri, qs, retry = true) {
     if (this._debug) console.warn(`Making request to: '${uri}'`);
     return new Promise((resolve, reject) => {
-      let options;
-      if (this._cloudflare) {
-        options = Object.assign({}, this._options, {method: 'GET', url: this._options.baseUrl + uri, qs});
-        options.baseUrl = null;
-      } else {
-        options = { uri, qs };
-      }
-
-      this._request(options, (err, res, body) => {
+      this._request.get({ uri, qs }, (err, res, body) => {
         if (err && retry) {
           return resolve(this._get(uri, qs, false));
         } else if (err) {
