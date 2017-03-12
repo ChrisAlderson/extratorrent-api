@@ -1,6 +1,6 @@
 # extratorrent-api
 
-[![Build Status](https://travis-ci.org/ChrisAlderson/extratorrent-api.svg?branch=master)]()
+[![Build Status](https://travis-ci.org/ChrisAlderson/extratorrent-api.svg?branch=master)](https://travis-ci.org/ChrisAlderson/extratorrent-api)
 [![Dependency Status](https://david-dm.org/ChrisAlderson/extratorrent-api.svg)](https://david-dm.org/ChrisAlderson/extratorrent-api)
 [![devDependency Status](https://david-dm.org/ChrisAlderson/extratorrent-api/dev-status.svg)](https://david-dm.org/ChrisAlderson/extratorrent-api#info=devDependencies)
 
